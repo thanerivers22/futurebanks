@@ -6,9 +6,8 @@
     <input type="text" id="username" placeholder="Enter username">
     <button onclick="login()">Login</button>
 </div>
-
-<div id="bankPage" style="display:none;">
-
+<div id="bankPage"</div></div> style="display:none;">
+<div class="card">
     <h1>Future Bank</h1>
 
     <p>Welcome <span id="userDisplay"></span></p>
@@ -118,7 +117,54 @@ function sendMoney() {
 </script>
 
 </body>
-</html>function showAllUsers() {
+</html>
+<head>
+<title>Future Bank</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+#loginPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 150px;
+}
+
+input {
+    padding: 10px;
+    margin: 5px;
+    width: 200px;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    background: #2563eb;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+#bankPage {
+    padding: 40px;
+}
+
+.card {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+</style>
+
+</head>
+function showAllUsers() {
     let text = "";
 
     for (let user in users) {
