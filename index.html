@@ -4,7 +4,10 @@
 <div id="loginPage">
     <h2>Future Bank Login</h2>
     <input type="text" id="username" placeholder="Enter username">
-    <button onclick="login()">Login</button>
+<br>
+<input type="password" id="password" placeholder="Enter password">
+<br>
+<button onclick="login()">Login</button>
 </div>
 <div id="bankPage"</div></div> style="display:none;">
 <div class="card">
@@ -33,38 +36,36 @@
 <script>
 
 let users = {
-    "admin": 1000,
-    "john": 500,
-    "mary": 300
+    "admin": { password: "admin123", balance: 1000 },
+    "john": { password: "john123", balance: 500 },
+    "mary": { password: "mary123", balance: 300 }
 };
 
 let currentUser = "";
-let balance = 0;
+let balance = 0; 
 
 function login() {
     let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
 
     if (users.hasOwnProperty(username)) {
-        currentUser = username;
-        balance = users[username];
 
-        document.getElementById("userDisplay").innerText = username;
-        document.getElementById("balance").innerText = balance;
+        if (users[username].password === password) {
 
-        document.getElementById("loginPage").style.display = "none";
-        document.getElementById("bankPage").style.display = "block";
+            currentUser = username;
+            balance = users[username].balance;
 
-        // VERY IMPORTANT LINE
-        document.getElementById("adminPanel").style.display = "none";
+            document.getElementById("userDisplay").innerText = username;
+            document.getElementById("balance").innerText = balance;
 
-        if (username === "admin") {
-            document.getElementById("adminPanel").style.display = "block";
-        }
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("bankPage").style.display = "block";
 
-    } else {
-        alert("User not found!");
-    }
-}
+            document.getElementById("adminPanel").style.display = "none";
+
+            if (username === "admin") {
+                document.getElementById("adminPanel").style.display = "block";
+            }
 
 function logout() {
     document.getElementById("loginPage").style.display = "block";
@@ -75,7 +76,7 @@ function logout() {
 function deposit() {
     let amount = Number(document.getElementById("amount").value);
     balance += amount;
-    users[currentUser] = balance;
+    users[currentUser].balance = balance;
     document.getElementById("balance").innerText = balance;
 }
 
@@ -86,7 +87,7 @@ function withdraw() {
         alert("Not enough money!");
     } else {
         balance -= amount;
-        users[currentUser] = balance;
+        users[currentUser].balance = balance;
         document.getElementById("balance").innerText = balance;
     }
 }
@@ -106,7 +107,7 @@ function sendMoney() {
     }
 
     balance -= amount;
-    users[currentUser] = balance;
+   users[currentUser].balance = balance;
     users[receiver] += amount;
 
     document.getElementById("balance").innerText = balance;
