@@ -1,0 +1,129 @@
+<html>
+<body>
+
+<div id="loginPage">
+    <h2>Future Bank Login</h2>
+    <input type="text" id="username" placeholder="Enter username">
+    <button onclick="login()">Login</button>
+</div>
+
+<div id="bankPage" style="display:none;">
+
+    <h1>Future Bank</h1>
+
+    <p>Welcome <span id="userDisplay"></span></p>
+    <p>Balance: $<span id="balance">0</span></p>
+
+    <input type="number" id="amount" placeholder="Enter amount">
+    <button onclick="deposit()">Deposit</button>
+    <button onclick="withdraw()">Withdraw</button>
+
+    <br><br>
+    <input type="text" id="receiver" placeholder="Receiver name">
+    <button onclick="sendMoney()">Send</button>
+
+    <br><br>
+    <button onclick="logout()">Logout</button><div id="adminPanel" style="display:none; border:1px solid black; padding:10px; margin-top:20px;">
+    <h3>Admin Panel</h3>
+    <button onclick="showAllUsers()">Show All Users</button>
+    <p id="allUsers"></p>
+</div>
+
+</div>
+
+<script>
+
+let users = {
+    "admin": 1000,
+    "john": 500,
+    "mary": 300
+};
+
+let currentUser = "";
+let balance = 0;
+
+function login() {
+    let username = document.getElementById("username").value;
+
+    if (users.hasOwnProperty(username)) {
+        currentUser = username;
+        balance = users[username];
+
+        document.getElementById("userDisplay").innerText = username;
+        document.getElementById("balance").innerText = balance;
+
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("bankPage").style.display = "block";
+
+        // VERY IMPORTANT LINE
+        document.getElementById("adminPanel").style.display = "none";
+
+        if (username === "admin") {
+            document.getElementById("adminPanel").style.display = "block";
+        }
+
+    } else {
+        alert("User not found!");
+    }
+}
+
+function logout() {
+    document.getElementById("loginPage").style.display = "block";
+    document.getElementById("bankPage").style.display = "none";
+    document.getElementById("adminPanel").style.display = "none";
+}
+
+function deposit() {
+    let amount = Number(document.getElementById("amount").value);
+    balance += amount;
+    users[currentUser] = balance;
+    document.getElementById("balance").innerText = balance;
+}
+
+function withdraw() {
+    let amount = Number(document.getElementById("amount").value);
+
+    if (amount > balance) {
+        alert("Not enough money!");
+    } else {
+        balance -= amount;
+        users[currentUser] = balance;
+        document.getElementById("balance").innerText = balance;
+    }
+}
+
+function sendMoney() {
+    let amount = Number(document.getElementById("amount").value);
+    let receiver = document.getElementById("receiver").value;
+
+    if (!users.hasOwnProperty(receiver)) {
+        alert("User does not exist!");
+        return;
+    }
+
+    if (amount > balance) {
+        alert("Not enough money!");
+        return;
+    }
+
+    balance -= amount;
+    users[currentUser] = balance;
+    users[receiver] += amount;
+
+    document.getElementById("balance").innerText = balance;
+
+    alert("Money sent to " + receiver);
+}
+
+</script>
+
+</body>
+</html>function showAllUsers() {
+    let text = "";
+
+    for (let user in users) {
+        text += user + " : $" + users[user] + "<br>";
+    }
+
+    document.getElementById("allUsers").innerHTML = text;
+}
