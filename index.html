@@ -1,308 +1,312 @@
+<!DOCTYPE html>
 <html>
-<body><<script>
+<head>
+<meta charset="UTF-8">
+<title>Truist National Bank</title>
 
-let users = {
-    "admin": { password: "admin123", balance: 1000 },
-    "john": { password: "john123", balance: 500 },
-    "mary": { password: "mary123", balance: 300 }
-};
-
-let currentUser = "";
-let balance = 0;
-let history = [];
-function login() {
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
-
-    if (users.hasOwnProperty(username)) {
-
-        if (users[username].password === password) {
-
-            currentUser = username;
-            balance = users[username].balance;
-
-            document.getElementById("userDisplay").innerText = username;
-            document.getElementById("balance").innerText = balance;
-
-            document.getElementById("loginPage").style.display = "none";
-            document.getElementById("bankPage").style.display = "block";
-
-            document.getElementById("adminPanel").style.display = "none";
-
-            if (username === "admin") {
-                document.getElementById("adminPanel").style.display = "block";
-            }
-
-        } else {
-            alert("Wrong password!");
-        }
-
-    } else {
-        alert("User not found!");
-    }
+<style>
+body{
+margin:0;
+font-family:Segoe UI,Arial;
+background:#f4f6fb;
+transition:0.3s;
 }
 
-function logout() {
-    document.getElementById("loginPage").style.display = "block";
-    document.getElementById("bankPage").style.display = "none";
-    document.getElementById("adminPanel").style.display = "none";
+.dark{
+background:#121212;
+color:white;
 }
 
-function deposit() {
-    let amount = Number(document.getElementById("amount").value);
-    balance += amount;
-    users[currentUser].balance = balance;
-    document.getElementById("balance").innerText = balance;
+header{
+background:#4b0082;
+color:white;
+padding:15px;
+text-align:center;
 }
 
-function withdraw() {
-    let amount = Number(document.getElementById("amount").value);
-
-    if (amount > balance) {
-        alert("Not enough money!");
-    } else {
-        balance -= amount;
-        users[currentUser].balance = balance;
-        document.getElementById("balance").innerText = balance;
-    }
+.container{
+max-width:1000px;
+margin:20px auto;
+padding:15px;
 }
 
-function sendMoney() {
-    let amount = Number(document.getElementById("amount").value);
-    let receiver = document.getElementById("receiver").value;
-
-    if (!users.hasOwnProperty(receiver)) {
-        alert("User does not exist!");
-        return;
-    }
-
-    if (amount > balance) {
-        alert("Not enough money!");
-        return;
-    }
-
-    balance -= amount;
-    users[currentUser].balance = balance;
-    users[receiver].balance += amount;
-
-    document.getElementById("balance").innerText = balance;
-
-    alert("Money sent to " + receiver);
+.card{
+background:white;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
 
-function showAllUsers() {
-    let text = "";
-
-    for (let user in users) {
-        text += user + " : $" + users[user].balance + "<br>";
-    }
-
-    document.getElementById("allUsers").innerHTML = text;
+.dark .card{
+background:#1e1e1e;
 }
 
-</script>
+.balance-card{
+background:linear-gradient(135deg,#4b0082,#6a0dad);
+color:white;
+padding:20px;
+border-radius:15px;
+margin-bottom:20px;
+}
 
-<<div id="loginPage">
-    <h2>Future Bank Login</h2>
+button{
+padding:8px 12px;
+margin:5px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+background:#4b0082;
+color:white;
+}
 
-    <input type="text" id="username" placeholder="Enter username">
-    <br>
-    <input type="password" id="password" placeholder="Enter password">
-    <br>
+button:hover{
+opacity:0.8;
+}
 
-    <button onclick="login()">Login</button>
+input{
+padding:8px;
+margin:5px;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+.green{color:green;}
+.red{color:red;}
+.blue{color:#0066cc;}
+
+.hidden{display:none;}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>Truist National Bank</h2>
+<button onclick="toggleMode()">Toggle Dark/Light</button>
+</header>
+
+<div class="container">
+
+<div id="loginPage" class="card">
+<h3>Login</h3>
+<input id="loginUser" placeholder="Username"><br>
+<input id="loginPass" type="password" placeholder="Password"><br>
+<button onclick="login()">Login</button>
 </div>
-<div id="bankPage" style="display:none;">
 
-<h2>Welcome, <span id="userDisplay"></span></h2>
-<p>Balance: $<span id="balance"></span></p>
+<div id="userPage" class="hidden">
 
-<h3>Transaction History</h3>
-<div id="history" class="card"></div>
+<div class="balance-card">
+Name: <span id="uName"></span><br>
+Account: <span id="uAcc"></span><br>
+Balance: $<span id="uBalance"></span>
+</div>
 
-<input type="number" id="amount" placeholder="Enter amount">
-<input type="text" id="receiver" placeholder="Receiver username">
-
-<button onclick="deposit()">Deposit</button>
-<button onclick="withdraw()">Withdraw</button>
+<div class="card">
+<h4>Send Money (Daily Limit $5000)</h4>
+<input id="sendAcc" placeholder="Receiver Account">
+<input id="sendAmt" type="number" placeholder="Amount">
 <button onclick="sendMoney()">Send</button>
 
+<h4>Search Transactions</h4>
+<input id="searchTx" placeholder="Search">
+<button onclick="searchTransactions()">Search</button>
+
+<h4>Transaction History</h4>
+<ul id="uHistory"></ul>
+
 <button onclick="logout()">Logout</button>
-<div id="history" class="card"></div>
 </div>
+</div>
+
+<div id="adminPage" class="hidden">
+
+<div class="balance-card">
+Admin Reserve: $<span id="adminBalance"></span><br>
+Total Users: <span id="totalUsers"></span><br>
+Total Bank Money: $<span id="totalMoney"></span>
+</div>
+
+<div class="card">
+
+<h4>Create User</h4>
+<input id="newUser" placeholder="Username">
+<input id="newPass" placeholder="Password">
+<button onclick="createUser()">Create</button>
+
+<h4>Deposit To User</h4>
+<input id="depositAcc" placeholder="Account">
+<input id="depositAmt" type="number" placeholder="Amount">
+<button onclick="depositToUser()">Deposit</button>
+
+<h4>All Users</h4>
+<div id="userList"></div>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+</div>
+
 </div>
 
 <script>
 
-et users = {
-    "admin": { password: "admin123", balance: 1000 },
-    "john": { password: "john123", balance: 500 },
-    "mary": { password: "mary123", balance: 300 }
-};
+let users = JSON.parse(localStorage.getItem("bankUsers"));
 
-let currentUser = "";
-let balance = 0;
-let history = [];
-
-function login() {
-    let username = document.getElementById("username").value;
-    let password = document.getElementById("password").value;
-
-    if (users.hasOwnProperty(username)) {
-
-        if (users[username].password === password) {
-
-            currentUser = username;
-            balance = users[username].balance;
-            history = [];
-
-            document.getElementById("userDisplay").innerText = username;
-            document.getElementById("balance").innerText = balance;
-
-            document.getElementById("loginPage").style.display = "none";
-            document.getElementById("bankPage").style.display = "block";
-
-            document.getElementById("adminPanel").style.display = "none";
-
-            if (username === "admin") {
-                document.getElementById("adminPanel").style.display = "block";
-            }
-
-            updateHistory();
-
-        } else {
-            alert("Wrong password!");
-        }
-
-    } else {
-        alert("User not found!");
-    }
+if(!users){
+users=[{
+username:"admin",
+password:"admin123",
+role:"admin",
+balance:100000,
+account:"0000000000",
+history:[],
+dailySent:0,
+lastSentDate:""
+}];
+localStorage.setItem("bankUsers",JSON.stringify(users));
 }
 
-function logout() {
-    document.getElementById("loginPage").style.display = "block";
-    document.getElementById("bankPage").style.display = "none";
+let currentUser=null;
+
+function save(){localStorage.setItem("bankUsers",JSON.stringify(users));}
+
+function login(){
+let u=document.getElementById("loginUser").value.trim();
+let p=document.getElementById("loginPass").value.trim();
+let found=users.find(x=>x.username===u && x.password===p);
+if(!found){alert("Invalid Login");return;}
+currentUser=found;
+document.getElementById("loginPage").classList.add("hidden");
+
+if(found.role==="admin"){
+document.getElementById("adminPage").classList.remove("hidden");
+loadAdmin();
+}else{
+document.getElementById("userPage").classList.remove("hidden");
+loadUser();
+}
 }
 
-function deposit() {
-    let amount = Number(document.getElementById("amount").value);
-
-    balance += amount;
-    users[currentUser].balance = balance;
-
-    history.push("Deposited $" + amount);
-
-    document.getElementById("balance").innerText = balance;
-    updateHistory();
+function loadUser(){
+document.getElementById("uName").textContent=currentUser.username;
+document.getElementById("uAcc").textContent=currentUser.account;
+document.getElementById("uBalance").textContent=currentUser.balance;
+renderHistory(currentUser.history);
 }
 
-function withdraw() {
-    let amount = Number(document.getElementById("amount").value);
+function sendMoney(){
+let acc=document.getElementById("sendAcc").value.trim();
+let amt=Number(document.getElementById("sendAmt").value);
 
-    if (amount > balance) {
-        alert("Not enough money!");
-    } else {
-        balance -= amount;
-        users[currentUser].balance = balance;
+if(amt<=0){alert("Invalid Amount");return;}
 
-        history.push("Withdrew $" + amount);
+let today=new Date().toDateString();
 
-        document.getElementById("balance").innerText = balance;
-        updateHistory();
-    }
+if(currentUser.lastSentDate!==today){
+currentUser.dailySent=0;
+currentUser.lastSentDate=today;
 }
 
-function sendMoney() {
-    let amount = Number(document.getElementById("amount").value);
-    let receiver = document.getElementById("receiver").value;
-
-    if (!users.hasOwnProperty(receiver)) {
-        alert("User does not exist!");
-        return;
-    }
-
-    if (amount > balance) {
-        alert("Not enough money!");
-        return;
-    }
-
-    balance -= amount;
-    users[currentUser].balance = balance;
-    users[receiver].balance += amount;
-
-    history.push("Sent $" + amount + " to " + receiver);
-
-    document.getElementById("balance").innerText = balance;
-    updateHistory();
+if(currentUser.dailySent+amt>5000){
+alert("Daily limit exceeded");
+return;
 }
 
-function updateHistory() {
-    let text = "";
+let receiver=users.find(x=>x.account==acc);
+if(!receiver){alert("Receiver not found");return;}
+if(amt>currentUser.balance){alert("Insufficient funds");return;}
 
-    for (let item of history) {
-        text += item + "<br>";
-    }
+currentUser.balance-=amt;
+receiver.balance+=amt;
+currentUser.dailySent+=amt;
 
-    document.getElementById("history").innerHTML = text;
+let ref="TX"+Math.floor(Math.random()*1000000);
+let time=new Date().toLocaleString();
+
+currentUser.history.push({text:"Sent $" + amt + " | Ref:"+ref + " | "+time,type:"sent"});
+receiver.history.push({text:"Received $" + amt + " | Ref:"+ref + " | "+time,type:"received"});
+
+save();
+loadUser();
+alert("Transfer Successful\nReference: "+ref);
 }
 
-</script>
-alert("Script loaded!")
-function updateHistory() {
-    let text = "";
-
-    for (let item of history) {
-        text += item + "<br>";
-    }
-
-    document.getElementById("history").innerHTML = text;
-}
-</body>
-</html>
-<head>
-<title>Future Bank</title>
-
-<style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0f172a;
-    color: white;
+function renderHistory(list){
+let ul=document.getElementById("uHistory");
+ul.innerHTML="";
+list.forEach(tx=>{
+let li=document.createElement("li");
+li.textContent=tx.text;
+if(tx.type==="sent") li.className="red";
+if(tx.type==="received") li.className="green";
+if(tx.type==="admin") li.className="blue";
+ul.appendChild(li);
+});
 }
 
-#loginPage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 150px;
+function searchTransactions(){
+let q=document.getElementById("searchTx").value.toLowerCase();
+let filtered=currentUser.history.filter(tx=>tx.text.toLowerCase().includes(q));
+renderHistory(filtered);
 }
 
-input {
-    padding: 10px;
-    margin: 5px;
-    width: 200px;
+function createUser(){
+let name=document.getElementById("newUser").value.trim();
+let pass=document.getElementById("newPass").value.trim();
+if(!name||!pass){alert("Fill fields");return;}
+let acc=Math.floor(1000000000+Math.random()*9000000000);
+users.push({
+username:name,
+password:pass,
+role:"user",
+balance:0,
+account:acc,
+history:[],
+dailySent:0,
+lastSentDate:""
+});
+save();
+loadAdmin();
+alert("User Created");
 }
 
-button {
-    padding: 10px 15px;
-    margin: 5px;
-    background: #2563eb;
-    border: none;
-    color: white;
-    cursor: pointer;
+function depositToUser(){
+let acc=document.getElementById("depositAcc").value;
+let amt=Number(document.getElementById("depositAmt").value);
+let user=users.find(x=>x.account==acc);
+if(!user||amt<=0){alert("Error");return;}
+user.balance+=amt;
+user.history.push({text:"Admin deposit $"+amt+" | "+new Date().toLocaleString(),type:"admin"});
+save();
+loadAdmin();
+alert("Deposited");
 }
 
-#bankPage {
-    padding: 40px;
-}<h3>Transaction History</h3>
-<div id="history" class="card"></div>
+function loadAdmin(){
+document.getElementById("adminBalance").textContent=currentUser.balance;
+let usersOnly=users.filter(u=>u.role==="user");
+document.getElementById("totalUsers").textContent=usersOnly.length;
+let totalMoney=users.reduce((sum,u)=>sum+u.balance,0);
+document.getElementById("totalMoney").textContent=totalMoney;
 
-.card {
-    background: #1e293b;
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
+let list=document.getElementById("userList");
+list.innerHTML="";
+usersOnly.forEach(u=>{
+list.innerHTML+=u.username+" | "+u.account+" | $"+u.balance+"<br>";
+});
 }
+
+function toggleMode(){
+document.body.classList.toggle("dark");
+}
+
+function logout(){
+location.reload();
+}
+
 </script>
 
 </body>
