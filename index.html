@@ -1,39 +1,5 @@
 <html>
-<body>
-
-<div id="loginPage">
-    <h2>Future Bank Login</h2>
-    <input type="text" id="username" placeholder="Enter username">
-<br>
-<input type="password" id="password" placeholder="Enter password">
-<br>
-<button onclick="login()">Login</button>
-</div>
-<div id="bankPage"</div></div> style="display:none;">
-<div class="card">
-    <h1>Future Bank</h1>
-
-    <p>Welcome <span id="userDisplay"></span></p>
-    <p>Balance: $<span id="balance">0</span></p>
-
-    <input type="number" id="amount" placeholder="Enter amount">
-    <button onclick="deposit()">Deposit</button>
-    <button onclick="withdraw()">Withdraw</button>
-
-    <br><br>
-    <input type="text" id="receiver" placeholder="Receiver name">
-    <button onclick="sendMoney()">Send</button>
-
-    <br><br>
-    <button onclick="logout()">Logout</button><div id="adminPanel" style="display:none; border:1px solid black; padding:10px; margin-top:20px;">
-    <h3>Admin Panel</h3>
-    <button onclick="showAllUsers()">Show All Users</button>
-    <p id="allUsers"></p>
-</div>
-
-</div>
-
-<script>
+<body><<script>
 
 let users = {
     "admin": { password: "admin123", balance: 1000 },
@@ -42,8 +8,8 @@ let users = {
 };
 
 let currentUser = "";
-let balance = 0; 
-
+let balance = 0;
+let history = [];
 function login() {
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
@@ -66,6 +32,15 @@ function login() {
             if (username === "admin") {
                 document.getElementById("adminPanel").style.display = "block";
             }
+
+        } else {
+            alert("Wrong password!");
+        }
+
+    } else {
+        alert("User not found!");
+    }
+}
 
 function logout() {
     document.getElementById("loginPage").style.display = "block";
@@ -107,16 +82,181 @@ function sendMoney() {
     }
 
     balance -= amount;
-   users[currentUser].balance = balance;
-    users[receiver] += amount;
+    users[currentUser].balance = balance;
+    users[receiver].balance += amount;
 
     document.getElementById("balance").innerText = balance;
 
     alert("Money sent to " + receiver);
 }
 
+function showAllUsers() {
+    let text = "";
+
+    for (let user in users) {
+        text += user + " : $" + users[user].balance + "<br>";
+    }
+
+    document.getElementById("allUsers").innerHTML = text;
+}
+
 </script>
 
+<<div id="loginPage">
+    <h2>Future Bank Login</h2>
+
+    <input type="text" id="username" placeholder="Enter username">
+    <br>
+    <input type="password" id="password" placeholder="Enter password">
+    <br>
+
+    <button onclick="login()">Login</button>
+</div>
+<div id="bankPage" style="display:none;">
+
+<h2>Welcome, <span id="userDisplay"></span></h2>
+<p>Balance: $<span id="balance"></span></p>
+
+<h3>Transaction History</h3>
+<div id="history" class="card"></div>
+
+<input type="number" id="amount" placeholder="Enter amount">
+<input type="text" id="receiver" placeholder="Receiver username">
+
+<button onclick="deposit()">Deposit</button>
+<button onclick="withdraw()">Withdraw</button>
+<button onclick="sendMoney()">Send</button>
+
+<button onclick="logout()">Logout</button>
+<div id="history" class="card"></div>
+</div>
+</div>
+
+<script>
+
+et users = {
+    "admin": { password: "admin123", balance: 1000 },
+    "john": { password: "john123", balance: 500 },
+    "mary": { password: "mary123", balance: 300 }
+};
+
+let currentUser = "";
+let balance = 0;
+let history = [];
+
+function login() {
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    if (users.hasOwnProperty(username)) {
+
+        if (users[username].password === password) {
+
+            currentUser = username;
+            balance = users[username].balance;
+            history = [];
+
+            document.getElementById("userDisplay").innerText = username;
+            document.getElementById("balance").innerText = balance;
+
+            document.getElementById("loginPage").style.display = "none";
+            document.getElementById("bankPage").style.display = "block";
+
+            document.getElementById("adminPanel").style.display = "none";
+
+            if (username === "admin") {
+                document.getElementById("adminPanel").style.display = "block";
+            }
+
+            updateHistory();
+
+        } else {
+            alert("Wrong password!");
+        }
+
+    } else {
+        alert("User not found!");
+    }
+}
+
+function logout() {
+    document.getElementById("loginPage").style.display = "block";
+    document.getElementById("bankPage").style.display = "none";
+}
+
+function deposit() {
+    let amount = Number(document.getElementById("amount").value);
+
+    balance += amount;
+    users[currentUser].balance = balance;
+
+    history.push("Deposited $" + amount);
+
+    document.getElementById("balance").innerText = balance;
+    updateHistory();
+}
+
+function withdraw() {
+    let amount = Number(document.getElementById("amount").value);
+
+    if (amount > balance) {
+        alert("Not enough money!");
+    } else {
+        balance -= amount;
+        users[currentUser].balance = balance;
+
+        history.push("Withdrew $" + amount);
+
+        document.getElementById("balance").innerText = balance;
+        updateHistory();
+    }
+}
+
+function sendMoney() {
+    let amount = Number(document.getElementById("amount").value);
+    let receiver = document.getElementById("receiver").value;
+
+    if (!users.hasOwnProperty(receiver)) {
+        alert("User does not exist!");
+        return;
+    }
+
+    if (amount > balance) {
+        alert("Not enough money!");
+        return;
+    }
+
+    balance -= amount;
+    users[currentUser].balance = balance;
+    users[receiver].balance += amount;
+
+    history.push("Sent $" + amount + " to " + receiver);
+
+    document.getElementById("balance").innerText = balance;
+    updateHistory();
+}
+
+function updateHistory() {
+    let text = "";
+
+    for (let item of history) {
+        text += item + "<br>";
+    }
+
+    document.getElementById("history").innerHTML = text;
+}
+
+</script>
+alert("Script loaded!")
+function updateHistory() {
+    let text = "";
+
+    for (let item of history) {
+        text += item + "<br>";
+    }
+
+    document.getElementById("history").innerHTML = text;
+}
 </body>
 </html>
 <head>
@@ -154,7 +294,8 @@ button {
 
 #bankPage {
     padding: 40px;
-}
+}<h3>Transaction History</h3>
+<div id="history" class="card"></div>
 
 .card {
     background: #1e293b;
@@ -174,3 +315,5 @@ function showAllUsers() {
 
     document.getElementById("allUsers").innerHTML = text;
 }
+</body>
+</html>
